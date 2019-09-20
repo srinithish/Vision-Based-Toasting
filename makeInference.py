@@ -10,11 +10,8 @@ import cv2 as cv
 import os 
 import numpy as np
 import collections as col
-import localize
+
 import matplotlib.pyplot as plt
-
-
-
 
 def enumerateObjects(Label,classMappingDict):
     
@@ -63,34 +60,6 @@ def showFrame(img,text):
 
 
 
-def getObjectsFromTestImg(imgArray):
-    
-    
-    
-    ##takes in orginal img array 
-
-    (objects, rectangles) = localize.localize(imgArray)
-    
-    
-    
-    listOfObjArr = []
-    
-    filteredObjs = []
-    filteredRects = []
-    
-    for obj,rect in zip(objects,rectangles):
-    
-        
-        croppedImageOfObj = imgArray[obj.ymin:obj.ymax,obj.xmin:obj.xmax]
-        
-        if  croppedImageOfObj.size != 0:
-            resizedImg = cv.resize(croppedImageOfObj,(28,28))
-            
-            listOfObjArr.append(resizedImg)
-            filteredObjs.append(obj)
-            filteredRects.append(rect)
-        
-    return listOfObjArr,filteredObjs,filteredRects
 
 
 
@@ -117,46 +86,13 @@ def putTextWrap(imgArray,text,location):
     return imgArray
     
     
-
-def drawBoxesAndText(imgArray,objects,rectangles,Labels,probs,classMappingdict):
+def getTestImg(imgArray):
     
     
-    ##need to send cropped image here
-    
-    reverseMappingDict = {value:key for key,value in classMappingdict.items()}
-    
-    LabelsAsStr  = [reverseMappingDict[i] for i in Labels]
-    
-    for obj,Label,prob in zip(objects,LabelsAsStr,probs):
-    
-        
-       centerY = (obj.ymin+obj.ymax)//2
-       centerX = (obj.xmin+obj.xmax)//2
-       
-       center = (centerX,centerY)
-       
-       if prob < 0.8:
-           Label = 'Unknown'
-       
-       text = Label + ' '+ str(round(prob*100,1))
-       putTextWrap(imgArray,text,center)
-        
-    for r in rectangles:
-    
-        cv.drawContours(imgArray, [r], -1, (0, 255, 0), 2)
+    resizedImg = cv.resize(imgArray,(28,28))
     
     
-    
-    return imgArray
-    
-    
-
-
-
-
-    
-    
-
+    return [resizedImg]
 
 if __name__ == '__main__':
     

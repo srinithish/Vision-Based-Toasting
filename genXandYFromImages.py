@@ -15,8 +15,17 @@ import cv2
 import collections as col
 
 import pickle
+import re
 
 import tqdm
+
+
+
+
+
+
+
+
 def genXandY(folderPath):
     
     dictOfImgAndLabels = col.defaultdict(list)
@@ -30,7 +39,16 @@ def genXandY(folderPath):
         
         filename = os.path.basename(file)
         filenameNoExt = os.path.splitext(os.path.basename(filename))[0]
-        Label = filenameNoExt.split('_')[1].replace('brown','')
+        
+        
+        
+#        Label = filenameNoExt.split('_')[1].replace('brown','')
+        m = re.match("\d+brown(?P<Labels>\d+)", 
+                         filenameNoExt,re.IGNORECASE)
+        
+        
+        Label = m.group('Labels')
+        
         
         imgArray = cv2.imread(file)
         resizedImg = cv2.resize(imgArray,(28,28))
@@ -48,7 +66,7 @@ def genXandY(folderPath):
 if __name__ == '__main__':
     
     
-    dictOfImgAndLabels = genXandY('./images/1/')
+    dictOfImgAndLabels = genXandY('./images/train/')
 
     pickle.dump(dictOfImgAndLabels,open('./Data/AllObjectLevelData.pkl','wb'))
     

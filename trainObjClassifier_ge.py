@@ -13,7 +13,7 @@ import sklearn
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-
+import makeInference
 import pickle
 
 import os
@@ -28,7 +28,7 @@ from sklearn.model_selection import train_test_split
 
 
 ##  True if training and False if inferencing
-isTrain = True 
+isTrain = False 
 trainFromScratch = True
 
 
@@ -253,15 +253,14 @@ if isTrain == True:
 
 
 if isTrain == False:
-    vidCapHandle = makeInference.initVidCap(camNum=1)
-    prevIngredientsDict = {}
-    CLS_MAPPING_DICT = pickle.load(open('./Data/CLS_MAP_DICT.pkl','rb'))
+    vidCapHandle = makeInference.initVidCap(camNum=0)
+    
     while True:
         
 
         testImg = makeInference.getFrame(vidCapHandle,mirror=True)
    
-        listOfObjArr,objects,rectangles = makeInference.getObjectsFromTestImg(testImg)
+        listOfObjArr= makeInference.getTestImg(testImg)
         
         listOfObjArr = np.array(listOfObjArr)
         
@@ -273,7 +272,7 @@ if isTrain == False:
             Labels,probs = sess.run([labelPreds,maxSigmoidProbs],feed_dict={X:listOfObjArr})
             
             
-            makeInference.drawBoxesAndText(testImg,objects,rectangles,Labels,probs,CLS_MAPPING_DICT)
+            makeInference.showFrame(testImg,Labels)
             
             
             ##recipe code
@@ -284,7 +283,7 @@ if isTrain == False:
 #            
 #            makeInference.putTextWrap(testImg,topRecipe,(50,50))
             
-        cv.imshow("Tracking", testImg)
+#        cv.imshow("Tracking", testImg)
     
         
     cv.destroyAllWindows()
